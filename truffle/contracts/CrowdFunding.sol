@@ -22,14 +22,7 @@ contract CrowdFunding is Ownable {
         uint256 cratedDate; // The date of campaign creation (in second)
         uint256 durationCampaign; // The campaign duration (in second)
         bool exists;
-        // address[] stakerAddress; // The addresses of all campaign funders
     }
-
-    // struct Staker {
-    //     // address campaignOwner; // The address of campaign crator
-    //     mapping(address => uint256) participations; // Address and participation of all campaigns
-    //     bool exists;
-    // }
 
     mapping(address => Campaigner) public campaigners;
     mapping(address => mapping(address => uint256)) public participations;
