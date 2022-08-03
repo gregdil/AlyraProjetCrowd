@@ -19,7 +19,6 @@ contract Staking is Ownable, ReentrancyGuard {
     uint256 annualRewardRate; //annual rewards percentage
     uint256 cooldown; //minimum time between two claims (in seconds)
     uint256 minimumReward; //minimum reward to claim
-    uint256 rewardPerSecond; // rewards percentage per sencond
 
     IERC20 public stakingToken;
 
@@ -32,17 +31,21 @@ contract Staking is Ownable, ReentrancyGuard {
         annualRewardRate = annualRewardRate_;
         cooldown = cooldown_;
         minimumReward = minimumReward_;
-        rewardPerSecond = annualRewardRate / 31536000;
         stakingToken = IERC20(stakingTokenAddress);
+    }
+
+    function rewardPerSecond(address a) public view returns (uint256) {
+        return (((stakers[a].totalStaked * annualRewardRate) / 100) / 31536000);
+    }
+
+    function rewardDuration(address a) public view returns (uint256) {
+        return block.timestamp - stakers[a].lastDeposit;
     }
 
     function getRewards(address a) public view returns (uint256 reward) {
         reward =
             stakers[a].totalRewards +
-            (stakers[a].totalStaked *
-                ((block.timestamp - stakers[a].lastDeposit) *
-                    rewardPerSecond)) /
-            100;
+            (rewardPerSecond(a) * rewardDuration(a));
     }
 
     function stake() external payable nonReentrant {
@@ -52,9 +55,7 @@ contract Staking is Ownable, ReentrancyGuard {
 
         if (stakers[user].exists) {
             if (stakers[user].totalStaked > 0) {
-                uint256 reward = ((stakers[user].totalStaked *
-                    ((block.timestamp - stakers[user].lastDeposit) *
-                        rewardPerSecond)) / 100);
+                uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
                 stakers[user].totalRewards += reward;
                 stakers[user].totalStaked += eth;
                 stakers[user].lastDeposit = block.timestamp;
@@ -82,9 +83,7 @@ contract Staking is Ownable, ReentrancyGuard {
         );
         require(stakers[user].totalStaked > 0, "You have nothing to unstake");
 
-        uint256 reward = (stakers[user].totalStaked *
-            (((block.timestamp - stakers[user].lastDeposit) * rewardPerSecond) /
-                100));
+        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
         stakers[user].totalStaked -= eth;
         stakers[user].lastDeposit = block.timestamp;
@@ -99,9 +98,7 @@ contract Staking is Ownable, ReentrancyGuard {
             "You didn't participate in staking"
         );
         require(stakers[user].totalStaked > 0, "You have nothing to unstake");
-        uint256 reward = (stakers[user].totalStaked *
-            (((block.timestamp - stakers[user].lastDeposit) * rewardPerSecond) /
-                100));
+        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         uint256 withdrawal = stakers[user].totalStaked;
@@ -125,9 +122,7 @@ contract Staking is Ownable, ReentrancyGuard {
             stakers[user].lastClaim + cooldown > block.timestamp,
             "You haven't reached the minimum time between two harvests"
         );
-        uint256 reward = (stakers[user].totalStaked *
-            (((block.timestamp - stakers[user].lastDeposit) * rewardPerSecond) /
-                100));
+        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         stakers[user].totalRewards = 0;
