@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.14;
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract Staking is Ownable, ReentrancyGuard {
@@ -20,7 +20,7 @@ contract Staking is Ownable, ReentrancyGuard {
     uint256 cooldown; //minimum time between two claims (in seconds)
     uint256 minimumReward; //minimum reward to claim
 
-    IERC20 public stakingToken;
+    ERC20 public stakingToken;
 
     constructor(
         uint256 annualRewardRate_,
@@ -31,7 +31,7 @@ contract Staking is Ownable, ReentrancyGuard {
         annualRewardRate = annualRewardRate_;
         cooldown = cooldown_;
         minimumReward = minimumReward_;
-        stakingToken = IERC20(stakingTokenAddress);
+        stakingToken = ERC20(stakingTokenAddress);
     }
 
     function rewardPerSecond(address a) public view returns (uint256) {
