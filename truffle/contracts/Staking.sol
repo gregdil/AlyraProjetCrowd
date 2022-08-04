@@ -8,8 +8,7 @@ import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract Staking is Ownable, ReentrancyGuard {
     struct Staker {
         uint256 totalStaked; // Total amount staked
-        uint256 lastDeposit; // Date of last deposit
-        uint256 lastClaim; // Date of last claim
+        uint256 lastDepositOrClaim; // Date of last deposit or last claim
         uint256 totalRewards; // Total of rewards
         bool exists;
     }
@@ -65,7 +64,7 @@ contract Staking is Ownable, ReentrancyGuard {
     }
 
     function rewardDuration(address a) public view returns (uint256) {
-        return block.timestamp - stakers[a].lastDeposit;
+        return block.timestamp - stakers[a].lastDepositOrClaim;
     }
 
     // ----------- GETTER -------------- //
@@ -84,8 +83,12 @@ contract Staking is Ownable, ReentrancyGuard {
         amount = stakers[a].totalStaked;
     }
 
-    function getLastClaim(address a) public view returns (uint256 lastClaim) {
-        lastClaim = stakers[a].lastClaim;
+    function getlastDepositOrClaim(address a)
+        public
+        view
+        returns (uint256 lastDepositOrClaim)
+    {
+        lastDepositOrClaim = stakers[a].lastDepositOrClaim;
     }
 
     // ----- STAKING / UNSTAKING FUNCTIONS  ---- //
@@ -105,7 +108,7 @@ contract Staking is Ownable, ReentrancyGuard {
                 stakers[user].totalRewards += reward;
                 stakers[user].totalStaked += eth;
                 poolBalance += eth;
-                stakers[user].lastDeposit = block.timestamp;
+                stakers[user].lastDepositOrClaim = block.timestamp;
                 emit StakingUpdate(
                     user,
                     getStakedAmount(user),
@@ -114,7 +117,7 @@ contract Staking is Ownable, ReentrancyGuard {
             } else {
                 stakers[user].totalStaked += eth;
                 poolBalance += eth;
-                stakers[user].lastDeposit = block.timestamp;
+                stakers[user].lastDepositOrClaim = block.timestamp;
                 emit StakingUpdate(
                     user,
                     getStakedAmount(user),
@@ -126,7 +129,7 @@ contract Staking is Ownable, ReentrancyGuard {
             Staker memory newUser;
             newUser.totalStaked = eth;
             poolBalance += eth;
-            newUser.lastDeposit = block.timestamp;
+            newUser.lastDepositOrClaim = block.timestamp;
             newUser.exists = true;
             // Add user to stakers
             stakers[user] = newUser;
@@ -153,7 +156,7 @@ contract Staking is Ownable, ReentrancyGuard {
         stakers[user].totalRewards += reward;
         stakers[user].totalStaked -= eth;
         poolBalance -= eth;
-        stakers[user].lastDeposit = block.timestamp;
+        stakers[user].lastDepositOrClaim = block.timestamp;
         (bool res, ) = user.call{value: amount}("");
         require(res, "Failed to send Ether");
         emit StakingUpdate(user, getStakedAmount(user), getRewards(user));
@@ -177,7 +180,7 @@ contract Staking is Ownable, ReentrancyGuard {
         poolBalance -= withdrawal;
         stakers[user].totalRewards = 0;
         stakers[user].totalStaked = 0;
-        stakers[user].lastDeposit = 0;
+        stakers[user].lastDepositOrClaim = 0;
         (bool res, ) = user.call{value: withdrawal}("");
         require(res, "Failed to send Ether");
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
@@ -200,15 +203,14 @@ contract Staking is Ownable, ReentrancyGuard {
         );
         require(stakers[user].totalStaked > 0, "You have nothing to unstake");
         require(
-            stakers[user].lastClaim + cooldown > block.timestamp,
+            stakers[user].lastDepositOrClaim + cooldown > block.timestamp,
             "You haven't reached the minimum time between two harvests"
         );
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         stakers[user].totalRewards = 0;
-        stakers[user].lastDeposit = block.timestamp;
-        stakers[user].lastClaim = block.timestamp;
+        stakers[user].lastDepositOrClaim = block.timestamp;
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
 
@@ -253,7 +255,7 @@ contract Staking is Ownable, ReentrancyGuard {
         poolBalance -= withdrawal;
         stakers[user].totalRewards = 0;
         stakers[user].totalStaked = 0;
-        stakers[user].lastDeposit = 0;
+        stakers[user].lastDepositOrClaim = 0;
         (bool res, ) = user.call{value: withdrawal}("");
         require(res, "Failed to send Ether");
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
