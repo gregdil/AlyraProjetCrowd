@@ -15,6 +15,7 @@ contract Staking is Ownable, ReentrancyGuard {
     }
 
     mapping(address => Staker) public stakers;
+    address[] public stakerList;
 
     uint256 public annualRewardRate; //annual rewards percentage
     uint256 public cooldown; //minimum time between two claims (in seconds)
@@ -41,6 +42,8 @@ contract Staking is Ownable, ReentrancyGuard {
         minimumReward = minimumReward_;
         stakingToken = ERC20(stakingTokenAddress);
     }
+
+    event PoolStatusChange(PoolInfo newStatus);
 
     // ----------- CALCULATION FUNCTIONS ------------ //
 
@@ -149,8 +152,6 @@ contract Staking is Ownable, ReentrancyGuard {
         require(res2, "Failed to send tokens");
     }
 
-    function unstakeAll() external onlyOwner {}
-
     // --------------- HARVEST FUNCTION -------------------------//
 
     function harvestReward() external nonReentrant {
@@ -177,7 +178,49 @@ contract Staking is Ownable, ReentrancyGuard {
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
     }
-}
 
-/// require(stakers[user].totalStaked > 0, "You didn't stake anything");
-/// require(block.timestamp - stakers[user].lastDeposit > cooldown, "You cannot yet withdraw your rewards");
+    function ForceRemoveStake(address user) private {
+        require(
+            stakers[user].exists = true,
+            "You didn't participate in staking"
+        );
+        require(stakers[user].totalStaked > 0, "You have nothing to unstake");
+        require(
+            stakers[user].lastClaim + cooldown > block.timestamp,
+            "You haven't reached the minimum time between two harvests"
+        );
+        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
+        stakers[user].totalRewards += reward;
+        uint256 harvest = stakers[user].totalRewards;
+        stakers[user].totalRewards = 0;
+        stakers[user].lastDeposit = block.timestamp;
+        stakers[user].lastClaim = block.timestamp;
+        bool res2 = ERC20(stakingToken).transfer(user, harvest);
+        require(res2, "Failed to send tokens");
+    }
+
+    // ----------------- OWNER FUNCTION ------------------- //
+
+    function pausedPool() external onlyOwner {
+        poolStatus = PoolInfo.PausedPool;
+        emit PoolStatusChange(PoolInfo.PausedPool);
+    }
+
+    function closedPool() external onlyOwner {
+        poolStatus = PoolInfo.ClosedPool;
+        emit PoolStatusChange(PoolInfo.ClosedPool);
+    }
+
+    function activePool() external onlyOwner {
+        poolStatus = PoolInfo.ActivePool;
+        emit PoolStatusChange(PoolInfo.ActivePool);
+    }
+
+    function unstakeAll() external onlyOwner {
+        require(poolStatus == PoolInfo.ClosedPool, "Pool is not closed");
+        for (uint256 i = 0; i < stakerList.length; i++) {
+            address user = stakerList[i];
+            ForceRemoveStake(user);
+        }
+    }
+}
