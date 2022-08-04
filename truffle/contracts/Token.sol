@@ -7,8 +7,11 @@ contract DevToken is ERC20{
 
     mapping(address => uint256) balances;
 
-
-    constructor(uint256 totalSupply) ERC20("CrowdStern", "Crowd"){
-        _mint(msg.sender, totalSupply);
+    constructor() ERC20("DevToken", "DevToken") {
     }
+
+    function claim(address claimer, uint amount) public {
+        _mint(claimer, amount);
+    }
+    
 }
