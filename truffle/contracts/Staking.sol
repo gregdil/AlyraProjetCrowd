@@ -52,6 +52,18 @@ contract Staking is Ownable, ReentrancyGuard {
             (rewardPerSecond(a) * rewardDuration(a));
     }
 
+    function getStaker(address a) public view returns (bool exists) {
+        exists = stakers[a].exists;
+    }
+
+    function getStakedAmount(address a) public view returns (uint256 amount) {
+        amount = stakers[a].totalStaked;
+    }
+
+    function getLastClaim(address a) public view returns (uint256 lastClaim) {
+        lastClaim = stakers[a].lastClaim;
+    }
+
     // ----- STAKING / UNSTAKING FUNCTIONS  ---- //
 
     function stake() external payable nonReentrant {
