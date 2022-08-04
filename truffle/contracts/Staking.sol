@@ -34,6 +34,8 @@ contract Staking is Ownable, ReentrancyGuard {
         stakingToken = ERC20(stakingTokenAddress);
     }
 
+    // ----------- CALCULATION FUNCTIONS ------------ //
+
     function rewardPerSecond(address a) public view returns (uint256) {
         return (((stakers[a].totalStaked * annualRewardRate) / 100) / 31536000);
     }
@@ -42,11 +44,15 @@ contract Staking is Ownable, ReentrancyGuard {
         return block.timestamp - stakers[a].lastDeposit;
     }
 
+    // ----------- GETTER -------------- //
+
     function getRewards(address a) public view returns (uint256 reward) {
         reward =
             stakers[a].totalRewards +
             (rewardPerSecond(a) * rewardDuration(a));
     }
+
+    // ----- STAKING / UNSTAKING FUNCTIONS  ---- //
 
     function stake() external payable nonReentrant {
         require(msg.value > 0, "You have not sent any ETH");
