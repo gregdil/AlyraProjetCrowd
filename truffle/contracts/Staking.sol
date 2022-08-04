@@ -48,25 +48,25 @@ contract Staking is Ownable, ReentrancyGuard {
             (rewardPerSecond(a) * rewardDuration(a));
     }
 
-    function stake(uint256 _amount) external payable nonReentrant {
-        require(_amount > 0, "You have not sent any ETH");
- 
+    function stake() external payable nonReentrant {
+        require(msg.value > 0, "You have not sent any ETH");
+        uint256 eth = msg.value;
         address user = msg.sender;
 
         if (stakers[user].exists) {
             if (stakers[user].totalStaked > 0) {
                 uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
                 stakers[user].totalRewards += reward;
-                stakers[user].totalStaked += _amount;
+                stakers[user].totalStaked += eth;
                 stakers[user].lastDeposit = block.timestamp;
             } else {
-                stakers[user].totalStaked += _amount;
+                stakers[user].totalStaked += eth;
                 stakers[user].lastDeposit = block.timestamp;
             }
         } else {
             // Create new user
             Staker memory newUser;
-            newUser.totalStaked = _amount;
+            newUser.totalStaked = eth;
             newUser.lastDeposit = block.timestamp;
             newUser.exists = true;
             // Add user to stakers
