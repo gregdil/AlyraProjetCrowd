@@ -22,6 +22,14 @@ contract Staking is Ownable, ReentrancyGuard {
 
     ERC20 public stakingToken;
 
+    enum PoolInfo {
+        ActivePool,
+        PausedPool,
+        ClosedPool
+    }
+
+    PoolInfo public poolStatus;
+
     constructor(
         uint256 annualRewardRate_,
         uint256 cooldown_, // (in second)
@@ -67,6 +75,10 @@ contract Staking is Ownable, ReentrancyGuard {
     // ----- STAKING / UNSTAKING FUNCTIONS  ---- //
 
     function stake() external payable nonReentrant {
+        require(
+            poolStatus == PoolInfo.ActivePool,
+            "Pool isn't active, you can't do this now"
+        );
         require(msg.value > 0, "You have not sent any ETH");
         uint256 eth = msg.value;
         address user = msg.sender;
@@ -93,6 +105,10 @@ contract Staking is Ownable, ReentrancyGuard {
     }
 
     function partialUnstake(uint256 amount) external nonReentrant {
+        require(
+            poolStatus == PoolInfo.ActivePool,
+            "Pool isn't active, you can't do this now"
+        );
         address user = msg.sender;
         uint256 eth = amount;
         require(
@@ -110,6 +126,10 @@ contract Staking is Ownable, ReentrancyGuard {
     }
 
     function unstake() external nonReentrant {
+        require(
+            poolStatus == PoolInfo.ActivePool,
+            "Pool isn't active, you can't do this now"
+        );
         address user = msg.sender;
         require(
             stakers[user].exists = true,
@@ -129,7 +149,15 @@ contract Staking is Ownable, ReentrancyGuard {
         require(res2, "Failed to send tokens");
     }
 
+    function unstakeAll() external onlyOwner {}
+
+    // --------------- HARVEST FUNCTION -------------------------//
+
     function harvestReward() external nonReentrant {
+        require(
+            poolStatus == PoolInfo.ActivePool,
+            "Pool isn't active, you can't do this now"
+        );
         address user = msg.sender;
         require(
             stakers[user].exists = true,
