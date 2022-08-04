@@ -16,9 +16,9 @@ contract Staking is Ownable, ReentrancyGuard {
 
     mapping(address => Staker) public stakers;
 
-    uint256 annualRewardRate; //annual rewards percentage
-    uint256 cooldown; //minimum time between two claims (in seconds)
-    uint256 minimumReward; //minimum reward to claim
+    uint256 public annualRewardRate; //annual rewards percentage
+    uint256 public cooldown; //minimum time between two claims (in seconds)
+    uint256 public minimumReward; //minimum reward to claim
 
     ERC20 public stakingToken;
 
