@@ -44,6 +44,18 @@ contract Staking is Ownable, ReentrancyGuard {
     }
 
     event PoolStatusChange(PoolInfo newStatus);
+    event StakerAdded(address stakerAddress, uint256 totalStaked);
+    event StakingUpdate(
+        address stakerAddress,
+        uint256 totalStaked,
+        uint256 totalRewards
+    );
+    event RewardsHarvested(address stakerAddress, uint256 rewardsHarvested);
+    event UnstakeCompleted(
+        address stakerAddress,
+        uint256 rewardsHarvested,
+        uint256 amountUnstaked
+    );
 
     // ----------- CALCULATION FUNCTIONS ------------ //
 
@@ -92,9 +104,19 @@ contract Staking is Ownable, ReentrancyGuard {
                 stakers[user].totalRewards += reward;
                 stakers[user].totalStaked += eth;
                 stakers[user].lastDeposit = block.timestamp;
+                emit StakingUpdate(
+                    user,
+                    getStakedAmount(user),
+                    getRewards(user)
+                );
             } else {
                 stakers[user].totalStaked += eth;
                 stakers[user].lastDeposit = block.timestamp;
+                emit StakingUpdate(
+                    user,
+                    getStakedAmount(user),
+                    getRewards(user)
+                );
             }
         } else {
             // Create new user
@@ -104,6 +126,9 @@ contract Staking is Ownable, ReentrancyGuard {
             newUser.exists = true;
             // Add user to stakers
             stakers[user] = newUser;
+            stakerList.push(user);
+
+            emit StakerAdded(user, eth);
         }
     }
 
@@ -126,6 +151,7 @@ contract Staking is Ownable, ReentrancyGuard {
         stakers[user].lastDeposit = block.timestamp;
         (bool res, ) = user.call{value: amount}("");
         require(res, "Failed to send Ether");
+        emit StakingUpdate(user, getStakedAmount(user), getRewards(user));
     }
 
     function unstake() external nonReentrant {
@@ -150,6 +176,8 @@ contract Staking is Ownable, ReentrancyGuard {
         require(res, "Failed to send Ether");
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
+
+        emit UnstakeCompleted(user, harvest, withdrawal);
     }
 
     // --------------- HARVEST FUNCTION -------------------------//
@@ -177,26 +205,8 @@ contract Staking is Ownable, ReentrancyGuard {
         stakers[user].lastClaim = block.timestamp;
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
-    }
 
-    function ForceRemoveStake(address user) private {
-        require(
-            stakers[user].exists = true,
-            "You didn't participate in staking"
-        );
-        require(stakers[user].totalStaked > 0, "You have nothing to unstake");
-        require(
-            stakers[user].lastClaim + cooldown > block.timestamp,
-            "You haven't reached the minimum time between two harvests"
-        );
-        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
-        stakers[user].totalRewards += reward;
-        uint256 harvest = stakers[user].totalRewards;
-        stakers[user].totalRewards = 0;
-        stakers[user].lastDeposit = block.timestamp;
-        stakers[user].lastClaim = block.timestamp;
-        bool res2 = ERC20(stakingToken).transfer(user, harvest);
-        require(res2, "Failed to send tokens");
+        emit RewardsHarvested(user, harvest);
     }
 
     // ----------------- OWNER FUNCTION ------------------- //
@@ -222,5 +232,26 @@ contract Staking is Ownable, ReentrancyGuard {
             address user = stakerList[i];
             ForceRemoveStake(user);
         }
+    }
+
+    function ForceRemoveStake(address user) private {
+        require(
+            stakers[user].exists = true,
+            "You didn't participate in staking"
+        );
+        require(stakers[user].totalStaked > 0, "You have nothing to unstake");
+        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
+        stakers[user].totalRewards += reward;
+        uint256 harvest = stakers[user].totalRewards;
+        uint256 withdrawal = stakers[user].totalStaked;
+        stakers[user].totalRewards = 0;
+        stakers[user].totalStaked = 0;
+        stakers[user].lastDeposit = 0;
+        (bool res, ) = user.call{value: withdrawal}("");
+        require(res, "Failed to send Ether");
+        bool res2 = ERC20(stakingToken).transfer(user, harvest);
+        require(res2, "Failed to send tokens");
+
+        emit UnstakeCompleted(user, harvest, withdrawal);
     }
 }
