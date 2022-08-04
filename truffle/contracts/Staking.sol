@@ -20,6 +20,7 @@ contract Staking is Ownable, ReentrancyGuard {
     uint256 public annualRewardRate; //annual rewards percentage
     uint256 public cooldown; //minimum time between two claims (in seconds)
     uint256 public minimumReward; //minimum reward to claim
+    uint256 public poolBalance; //Amount staked on the pool
 
     ERC20 public stakingToken;
 
@@ -103,6 +104,7 @@ contract Staking is Ownable, ReentrancyGuard {
                 uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
                 stakers[user].totalRewards += reward;
                 stakers[user].totalStaked += eth;
+                poolBalance += eth;
                 stakers[user].lastDeposit = block.timestamp;
                 emit StakingUpdate(
                     user,
@@ -111,6 +113,7 @@ contract Staking is Ownable, ReentrancyGuard {
                 );
             } else {
                 stakers[user].totalStaked += eth;
+                poolBalance += eth;
                 stakers[user].lastDeposit = block.timestamp;
                 emit StakingUpdate(
                     user,
@@ -122,6 +125,7 @@ contract Staking is Ownable, ReentrancyGuard {
             // Create new user
             Staker memory newUser;
             newUser.totalStaked = eth;
+            poolBalance += eth;
             newUser.lastDeposit = block.timestamp;
             newUser.exists = true;
             // Add user to stakers
@@ -148,6 +152,7 @@ contract Staking is Ownable, ReentrancyGuard {
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
         stakers[user].totalStaked -= eth;
+        poolBalance -= eth;
         stakers[user].lastDeposit = block.timestamp;
         (bool res, ) = user.call{value: amount}("");
         require(res, "Failed to send Ether");
@@ -169,6 +174,7 @@ contract Staking is Ownable, ReentrancyGuard {
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         uint256 withdrawal = stakers[user].totalStaked;
+        poolBalance -= withdrawal;
         stakers[user].totalRewards = 0;
         stakers[user].totalStaked = 0;
         stakers[user].lastDeposit = 0;
@@ -244,6 +250,7 @@ contract Staking is Ownable, ReentrancyGuard {
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         uint256 withdrawal = stakers[user].totalStaked;
+        poolBalance -= withdrawal;
         stakers[user].totalRewards = 0;
         stakers[user].totalStaked = 0;
         stakers[user].lastDeposit = 0;
