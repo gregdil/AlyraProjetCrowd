@@ -4,8 +4,9 @@ pragma solidity >=0.8.14;
 import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./Chainlink.sol";
 
-contract Staking is Ownable, ReentrancyGuard {
+contract Staking is Ownable, ReentrancyGuard, Chainlink {
     struct Staker {
         uint256 totalStaked; // Total amount staked
         uint256 lastDepositOrClaim; // Date of last deposit or last claim
