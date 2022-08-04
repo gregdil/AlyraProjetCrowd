@@ -125,7 +125,7 @@ contract Staking is Ownable, ReentrancyGuard {
         stakers[user].lastDeposit = 0;
         (bool res, ) = user.call{value: withdrawal}("");
         require(res, "Failed to send Ether");
-        (bool res2, ) = user.call{value: harvest}("");
+        bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
     }
 
@@ -146,8 +146,8 @@ contract Staking is Ownable, ReentrancyGuard {
         stakers[user].totalRewards = 0;
         stakers[user].lastDeposit = block.timestamp;
         stakers[user].lastClaim = block.timestamp;
-        (bool res, ) = user.call{value: harvest}("");
-        require(res, "Failed to send tokens");
+        bool res2 = ERC20(stakingToken).transfer(user, harvest);
+        require(res2, "Failed to send tokens");
     }
 }
 
