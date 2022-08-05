@@ -76,6 +76,14 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
             (rewardPerSecond(a) * rewardDuration(a));
     }
 
+    function getNextRewards(address a) public view returns (uint256 reward) {
+        reward = rewardPerSecond(a) * rewardDuration(a);
+    }
+
+    function getTotalRewards(address a) public view returns (uint256 reward) {
+        reward = stakers[a].totalRewards;
+    }
+
     function getStaker(address a) public view returns (bool exists) {
         exists = stakers[a].exists;
     }
