@@ -11,6 +11,8 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         uint256 totalStaked; // Total amount staked
         uint256 lastDepositOrClaim; // Date of last deposit or last claim
         uint256 totalRewards; // Total of rewards
+        uint256 allTimeHarvested; // Amount harvested from the start
+        uint256 firstTimeDeposit; // Date of the first deposit
         bool exists;
     }
 
@@ -112,6 +114,22 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         lastDepositOrClaim = stakers[a].lastDepositOrClaim;
     }
 
+    function getAllTimeHarvest(address a)
+        public
+        view
+        returns (uint256 allTimeHarvest)
+    {
+        allTimeHarvest = stakers[a].allTimeHarvested;
+    }
+
+    function getFirstTimeDeposit(address a)
+        public
+        view
+        returns (uint256 firstTimeDeposit)
+    {
+        firstTimeDeposit = stakers[a].firstTimeDeposit;
+    }
+
     // ----- STAKING / UNSTAKING FUNCTIONS  ---- //
 
     function stake() external payable nonReentrant {
@@ -151,6 +169,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
             newUser.totalStaked = eth;
             poolBalance += eth;
             newUser.lastDepositOrClaim = block.timestamp;
+            newUser.firstTimeDeposit = block.timestamp;
             newUser.exists = true;
             // Add user to stakers
             stakers[user] = newUser;
@@ -180,6 +199,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         stakers[user].lastDepositOrClaim = block.timestamp;
         (bool res, ) = user.call{value: amount}("");
         require(res, "Failed to send Ether");
+
         emit StakingUpdate(user, getStakedAmount(user), getRewards(user));
     }
 
@@ -198,6 +218,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         uint256 withdrawal = stakers[user].totalStaked;
+        stakers[user].allTimeHarvested += reward;
         poolBalance -= withdrawal;
         stakers[user].totalRewards = 0;
         stakers[user].totalStaked = 0;
@@ -229,6 +250,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         );
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
+        stakers[user].allTimeHarvested += reward;
         uint256 harvest = stakers[user].totalRewards;
         stakers[user].lastDepositOrClaim = block.timestamp;
         stakers[user].totalRewards = 0;
@@ -271,6 +293,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         require(stakers[user].totalStaked > 0, "You have nothing to unstake");
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
+        stakers[user].allTimeHarvested += reward;
         uint256 harvest = stakers[user].totalRewards;
         uint256 withdrawal = stakers[user].totalStaked;
         poolBalance -= withdrawal;
