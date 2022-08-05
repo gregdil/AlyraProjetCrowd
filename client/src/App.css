@@ -13,6 +13,30 @@
   --dark-gray: #777;
 }
 
+body {
+
+  background-color: #F0F3F5;
+}
+#logo {
+  margin: 10px;
+}
+span.amount {
+  margin-top:1rem;
+  padding-top: 1rem;
+  font-size: 4rem;
+  font-weight: normal;
+  color: #31135C;
+}
+
+span.currency {
+
+  margin-top:1rem;
+  padding-top: 1rem;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #31135C;
+}
+
 #App .container {
   width: 40%;
   min-width: 60rem;
@@ -69,10 +93,6 @@ p,
 details code {
   margin-top: 1rem;
   margin-bottom: 1.4rem;
-}
-
-p {
-  line-height: 2.6rem;
 }
 
 p span.code {

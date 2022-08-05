@@ -1,0 +1,14 @@
+.header{
+    text-align: right;
+    border-bottom: 2px solid rgb(82, 29, 139);
+    border-left: 2px solid rgb(82, 29, 139);
+    border-right: 2px solid rgb(82, 29, 139);
+    background-color: #fff;
+    padding: 5px;
+    border-bottom-right-radius: 0.5rem;
+    border-bottom-left-radius: 1rem;
+}
+#logo {
+    float: left;
+    display: block;
+}
