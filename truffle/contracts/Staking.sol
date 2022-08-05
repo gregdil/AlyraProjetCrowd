@@ -214,8 +214,9 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
 
     function harvestReward() external nonReentrant {
         require(
-            poolStatus == PoolInfo.ActivePool,
-            "Pool isn't active, you can't do this now"
+            poolStatus == PoolInfo.ActivePool ||
+                poolStatus == PoolInfo.PausedPool,
+            "Pool is closed, you can't do this now"
         );
         address user = msg.sender;
         require(
