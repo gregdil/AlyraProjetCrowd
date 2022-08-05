@@ -76,14 +76,6 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
             (rewardPerSecond(a) * rewardDuration(a));
     }
 
-    function getNextRewards(address a) public view returns (uint256 reward) {
-        reward = rewardPerSecond(a) * rewardDuration(a);
-    }
-
-    function getTotalRewards(address a) public view returns (uint256 reward) {
-        reward = stakers[a].totalRewards;
-    }
-
     function getStaker(address a) public view returns (bool exists) {
         exists = stakers[a].exists;
     }
@@ -99,6 +91,17 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
     {
         remainingCooldown = ((stakers[a].lastDepositOrClaim + cooldown) -
             block.timestamp);
+    }
+
+    function getStakersInPool() public view returns (uint256 stakersInPool) {
+        uint256 stakersActive;
+        for (uint256 i = 0; i < stakerList.length; i++) {
+            address user = stakerList[i];
+            if (stakers[user].totalStaked > 0) {
+                stakersActive++;
+            }
+        }
+        stakersInPool = stakersActive;
     }
 
     function getlastDepositOrClaim(address a)
@@ -219,9 +222,8 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
             stakers[user].exists = true,
             "You didn't participate in staking"
         );
-        require(stakers[user].totalStaked > 0, "You have nothing to unstake");
         require(
-            stakers[user].lastDepositOrClaim + cooldown < block.timestamp,
+            (stakers[user].lastDepositOrClaim + cooldown < block.timestamp),
             "You haven't reached the minimum time between two harvests"
         );
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
