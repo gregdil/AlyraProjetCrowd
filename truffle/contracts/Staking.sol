@@ -210,7 +210,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         emit UnstakeCompleted(user, harvest, withdrawal);
     }
 
-    // --------------- HARVEST FUNCTION -------------------------//
+    // --------------- HARVEST FUNCTION -------------------//
 
     function harvestReward() external nonReentrant {
         require(
@@ -229,8 +229,8 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
-        stakers[user].totalRewards = 0;
         stakers[user].lastDepositOrClaim = block.timestamp;
+        stakers[user].totalRewards = 0;
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
 
