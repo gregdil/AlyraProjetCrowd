@@ -21,10 +21,8 @@ class StakingOverview extends Component{
         this.state = {
             connectedWallet: null,
             connectedNetwork: null,
-            web3: null,
             contract: null,
             contractAddress: null,
-            tokenReadOnly: null,
             latestPrice: 0,
             contractProperties: {
                 balance: 0,
@@ -32,7 +30,6 @@ class StakingOverview extends Component{
                 baseInterest: 0,
                 cooldown: 0,
                 totalStake: 0,
-                maxWeight: 0,
                 minimumReward: 0,
                 annualRewardRate: 0,
                 stakersInPool: 0
@@ -47,22 +44,8 @@ class StakingOverview extends Component{
                 firstTimeDeposit: 0,
                 allTimeHarvest: 0
             },
-            /*
-            formProperties: {
-                stakeInstantly: false,
-                increaseWeightInstantly: false,
-                signature: '',
-                newStake: '',
-                newWeight: '',
-                withdrawAmount: '',
-                withdrawWhenClaiming: false
-            },
-            */
             transactionsListing: []
         }
-
-       // this.handleChange = this.handleChange.bind(this);
-        //this.submitChange = this.submitChange.bind(this);
     }
     
     async componentDidMount() {
@@ -76,28 +59,17 @@ class StakingOverview extends Component{
         let state = this.state
         state.contract = contract;
         state.latestPrice = latestPrice;
-
         state.connectedWallet = accounts[0];
-
         state = await connectWallet(state);
         state = await getContractProperties(state);
         state = await getUserTransactions(state);
         state = await getUserProperties(state);
+        this.setState(state);
+    }
 
-        this.setState(state);
-    }
-/*
-    handleChange(event) {
-        let state = this.state
-        let name = event.target.name
-        const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
-        console.log(name, value)
-        state.formProperties[name] = value
-        this.setState(state);
-    }
-*/
-      // Staking d'Eth
-      stake = async () => {
+    // Staking d'Eth
+    stake = async () => {
+    
         const { contract, accounts, chainlinkinstance  } = this.props.state;
 
         let valeur = document.getElementById("newStake").value;
@@ -117,39 +89,45 @@ class StakingOverview extends Component{
         state = await getUserProperties(state);
         state = await getContractProperties(state);
         this.setState(state);
-      }
+    }
 
-       // Unstaking d'Eth
-       unstake = async () => {
+    // Unstaking d'Eth
+    unstake = async () => {
 
-        const { contract, accounts } = this.props.state;
+        const { contract, accounts, chainlinkinstance } = this.props.state;
 
         await contract.methods.unstake().send({from: accounts[0]});
 
+        // Update ETH/USD
+        let latestPrice = await chainlinkinstance.methods.getLatestPrice().call();
+        latestPrice = latestPrice / 100000000;
+
         let state = this.state
+        state.latestPrice = latestPrice;
         state = await getUserTransactions(state);
         state = await getUserProperties(state);
         state = await getContractProperties(state);
         this.setState(state);
+    }
 
-       }
-
-
-       // Unstaking d'Eth
-       harvestReward = async () => {
-        console.log('harvestReward');
-        const { contract, accounts } = this.props.state;
+    // Unstaking d'Eth
+    harvestReward = async () => {
+    
+        const { contract, accounts, chainlinkinstance } = this.props.state;
 
         await contract.methods.harvestReward().send({from: accounts[0]});
 
+        // Update ETH/USD
+        let latestPrice = await chainlinkinstance.methods.getLatestPrice().call();
+        latestPrice = latestPrice / 100000000;
+
         let state = this.state
+        state.latestPrice = latestPrice;
         state = await getUserTransactions(state);
         state = await getUserProperties(state);
         state = await getContractProperties(state);
         this.setState(state);
-       }
-
-       
+    }  
 
     render() {
         let state = this.state
@@ -194,6 +172,7 @@ class StakingOverview extends Component{
                                             <p>Date of first deposit: {state.userProperties.firstTimeDeposit } </p>
                                         </div>
                                         <div className='col-6 text-end'>
+                                            {state.contractProperties.minimumReward}
                                             <button id="harvestRewardButton" className='btn btn-secondary btn-action m-2' onClick={this.harvestReward}>harvest Reward</button>
                                             <button id="unstakeButton" className='btn btn-secondary btn-action m-2' onClick={this.unstake}>Unstake</button>
                                         </div>
