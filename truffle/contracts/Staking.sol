@@ -60,7 +60,6 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         uint256 amountUnstaked
     );
 
-
     event Transaction(
         string action,
         address stakerAddress,
@@ -68,7 +67,6 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         uint256 rewards,
         uint256 timastamp
     );
-
 
     // ----------- CALCULATION FUNCTIONS ------------ //
 
@@ -164,8 +162,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
                     getRewards(user)
                 );
 
-                emit Transaction('deposit', user, eth, reward, block.timestamp);
-
+                emit Transaction("deposit", user, eth, reward, block.timestamp);
             } else {
                 stakers[user].totalStaked += eth;
                 poolBalance += eth;
@@ -176,7 +173,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
                     getRewards(user)
                 );
 
-                emit Transaction('deposit', user, eth, 0, block.timestamp);
+                emit Transaction("deposit", user, eth, 0, block.timestamp);
             }
         } else {
             // Create new user
@@ -192,7 +189,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
 
             emit StakerAdded(user, eth);
 
-            emit Transaction('deposit', user, eth, 0, block.timestamp);
+            emit Transaction("deposit", user, eth, 0, block.timestamp);
         }
     }
 
@@ -237,7 +234,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         uint256 withdrawal = stakers[user].totalStaked;
-        stakers[user].allTimeHarvested += reward;
+        stakers[user].allTimeHarvested += harvest;
         poolBalance -= withdrawal;
         stakers[user].totalRewards = 0;
         stakers[user].totalStaked = 0;
@@ -248,7 +245,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         require(res2, "Failed to send tokens");
 
         emit UnstakeCompleted(user, harvest, withdrawal);
-        emit Transaction('unstake', user, withdrawal, harvest, block.timestamp);
+        emit Transaction("unstake", user, withdrawal, harvest, block.timestamp);
     }
 
     // --------------- HARVEST FUNCTION -------------------//
@@ -270,8 +267,8 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         );
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
-        stakers[user].allTimeHarvested += reward;
         uint256 harvest = stakers[user].totalRewards;
+        stakers[user].allTimeHarvested += harvest;
         stakers[user].lastDepositOrClaim = block.timestamp;
         stakers[user].totalRewards = 0;
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
@@ -279,7 +276,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
 
         emit RewardsHarvested(user, harvest);
 
-        emit Transaction('harvest', user, 0, harvest, block.timestamp);
+        emit Transaction("harvest", user, 0, harvest, block.timestamp);
     }
 
     // ----------------- OWNER FUNCTION ------------------- //
@@ -315,9 +312,9 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         require(stakers[user].totalStaked > 0, "You have nothing to unstake");
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
-        stakers[user].allTimeHarvested += reward;
         uint256 harvest = stakers[user].totalRewards;
         uint256 withdrawal = stakers[user].totalStaked;
+        stakers[user].allTimeHarvested += harvest;
         poolBalance -= withdrawal;
         stakers[user].totalRewards = 0;
         stakers[user].totalStaked = 0;
