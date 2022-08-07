@@ -1,8 +1,6 @@
 import React, {Component}  from 'react'
 import {useNavigate} from 'react-router-dom'
-import Web3 from 'web3'
 import Address from './Address/Address'
-import {connectWallet, getConnectedNetwork, getContractProperties} from './utils'
 
 /**
  * Component to update stake properties in the contract
@@ -33,45 +31,6 @@ class ContractProperties extends Component{
 
     }
     
-    async componentDidMount(){
-
-        const { contract,accounts, contractOwnerAddresse } = this.props.state;
-
-        console.log('Contract : componentDidMount accounts : ' + accounts);
-        console.log('Contract : componentDidMount contractOwnerAddresse : ' + contractOwnerAddresse);
-
-/////        console.log('Contract : componentDidMount contractAddress ' + this.props.contractAddress); 
-     //   console.log('Contract : componentDidMount abiContract ' + this.props.abiContract); 
-        /*
-        let state = this.state
-
-        // Get read version and write version (connected via wallet) of web3
-        
-        state.web3ReadOnly = new Web3(this.props.web3Provider);
-        state.contractReadOnly = new state.web3ReadOnly.eth.Contract(this.props.abiContract, this.props.contractAddress);
-        
-        // First we need to check if a Web3 browser extension was found
-        if (!window.ethereum) {
-            alert("Web3 wallet not found");
-        } else {
-            state.web3 = new Web3(window.ethereum);
-            state.contract = new state.web3.eth.Contract(this.props.abiContract, this.props.contractAddress);
-            state = await connectWallet(state);
-
-        console.log('Contract : componentDidMount state.connectedWallet ' + state.connectedWallet); 
-        console.log('Contract : componentDidMount state.contract.addrr ' + state.contract.addrr); 
-
-        //console.log('Contract : componentDidMount state ' + state); 
-            state = await getContractProperties(state)
-            console.log('Contract : componentDidMount state.contractProperties._contractOwner ' + state.contractProperties._contractOwner); 
-           // state.contractProperties.interestDecimalsExp = Math.log10(state.contractProperties.interestDecimals)
-        }
-
-        console.log('Contract : componentDidMount connectWallet ' + state.connectedWallet); 
-        this.setState(state)
-        */
-    }
-
     // Mise en pause de la Pool
     pause = async () => {
         const { contract, accounts } = this.props.state;

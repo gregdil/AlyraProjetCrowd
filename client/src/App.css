@@ -41,55 +41,6 @@ hr {
   margin: 4rem 0;
 }
 
-#App .container .welcome h1 {
-  padding-top: 7.5rem;
-  font-size: 2.6rem;
-}
-
-#App .container .demo .contract-container {
-  display: flex;
-}
-
-#App .container .demo .contract-container code {
-  min-width: 42rem;
-  border-radius: 1rem 0 0 1rem;
-}
-
-#App .container .demo .contract-container .btns {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-  padding: 0 1rem;
-  background-color: var(--gray);
-  border-radius: 0 1rem 1rem 0;
-}
-
-#App .container .demo .contract-container .btns>* {
-  width: 12rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 0;
-  background-color: var(--light-gray);
-  border: none;
-  font-size: 1.2rem;
-  font-family: monospace;
-  cursor: pointer;
-}
-
-#App .container .demo .contract-container .btns>*:hover {
-  background-color: var(--dark-gray);
-}
-
-#App .container .demo .contract-container .btns .input-btn input {
-  width: 4rem;
-  text-align: center;
-  font-family: monospace;
-  font-size: 1.2rem;
-}
-
 #App .container footer {
   padding-bottom: 7.5rem;
 }
@@ -108,6 +59,7 @@ hr {
   border-right: 0px solid transparent;
   height: 55px;
 }
+
 #stakeButton {
   font-size: 2rem;
   padding: 10px 2rem;
@@ -119,14 +71,16 @@ hr {
   border-radius: 0;
   height: 55px;
 }
+
 .btn-action {
   background-color: #31135C;
   font-size: 1.42rem;
 }
+
 p.amount {
-  padding-top: 1rem;
-  
+  padding-top: 1rem; 
 }
+
 span.amount {
   padding-top: 4rem;
   line-height: 5rem;

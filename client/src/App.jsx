@@ -4,8 +4,7 @@ import getWeb3 from "./getWeb3";
 import {
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate
+  Route
 } from 'react-router-dom'
 
 import "./App.css";
