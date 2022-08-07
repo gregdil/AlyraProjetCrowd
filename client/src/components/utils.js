@@ -70,7 +70,7 @@ async function getContractProperties(state){
     
     state.contractProperties.annualRewardRate = annualRewardRate;
     state.contractProperties.cooldown = cooldown;
-    state.contractProperties.annualRewminimumRewardardRate = minimumReward;
+    state.contractProperties.minimumReward = minimumReward;
     state.contractProperties.totalStake = poolBalance;
     state.contractProperties.stakersInPool = stakersInPool;
     state.contractProperties.tokenAddress = stakingToken;

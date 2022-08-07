@@ -17,8 +17,8 @@ class Footer extends Component {
                                 <li>Address of the contract owner is: '{ this.props.state.contractProperties._contractOwner}'.</li>
                             </ul>
                         </div>
-                        <div className='col-3'>
-                          <button onClick={() => this.props.navigate('/contract')}>Administration</button>
+                        <div className='col-3 text-end'>
+                          <button  className='btn btn-secondary btn-action m-2' onClick={() => this.props.navigate('/contract')}>Administration</button>
                         </div>
                     </div>
                 </div>
