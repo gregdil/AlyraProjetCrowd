@@ -11,19 +11,15 @@ import {
 import "./App.css";
 
 // The ABI (Application Binary Interface) is the interface of the smart contract
-import contractABIJSON from './contracts/Staking.json'
+import contractABIJSON from './contracts/Staking.json';
+import chainlinkABIJSON from './contracts/Chainlink.json';
 
 import StakingOverviewWithNavigate from './components/StakingOverview';
 import ContractPropertiesWithNavigate from './components/ContractProperties';
-import TokensWithNavigate from './components/Tokens';
-
-//const contractAddress = "0x053b11eA0A6B3DaC8B5BAE15F505133351c6A23D";
-//const abiContract = contractABIJSON.abi;
-
 
 class App extends Component {
 
-  state = { web3: null, contract: null, isAdmin: false, accounts: null, contractOwnerAddresse: null};
+  state = { web3: null, contract: null, isAdmin: false, accounts: null, contractOwnerAddresse: null, chainlinkinstance: null};
 
   componentDidMount = async () => {
       try {
@@ -41,14 +37,14 @@ class App extends Component {
         deployedNetwork && deployedNetwork.address,
       );
 
-      let options = {
-        fromBlock: 0,
-        toBlock: 'latest'
-      };
+      const chainlinkDeployedNetwork = chainlinkABIJSON.networks[networkId];
+      const chainlinkinstance = new web3.eth.Contract(
+        chainlinkABIJSON.abi,
+        chainlinkDeployedNetwork && chainlinkDeployedNetwork.address,
+      );
 
       // Récupération de l'adresse du propriétaire du contrat
       let contractOwnerAddresse = await instance.methods.owner().call();
-      console.log('contractOwnerAddresse : ' + contractOwnerAddresse);
 
       // Vérification si l'on est admin
       let isAdmin = false;
@@ -57,7 +53,7 @@ class App extends Component {
       }
            
       // Update des informations du state
-      this.setState({ web3, contract: instance, isAdmin, accounts, contractOwnerAddresse});
+      this.setState({ web3, contract: instance, isAdmin, accounts, contractOwnerAddresse, chainlinkinstance});
 
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -77,11 +73,8 @@ class App extends Component {
     return (
       <Router>
         <Routes>
-          <Route exact path='/' element={<Navigate to='/main' replace={true} />} />
-          <Route path='/main' element = { <StakingOverviewWithNavigate state={this.state} />}/>
+          <Route path='/' element = { <StakingOverviewWithNavigate state={this.state} />}/>
           <Route path='/contract' element = { <ContractPropertiesWithNavigate state={this.state} />} />
-  
-          <Route path='/token' element = { <TokensWithNavigate />}/>
         </Routes>
       </Router>
     )

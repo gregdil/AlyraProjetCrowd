@@ -60,6 +60,16 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         uint256 amountUnstaked
     );
 
+
+    event Transaction(
+        string action,
+        address stakerAddress,
+        uint256 amountStacked,
+        uint256 rewards,
+        uint256 timastamp
+    );
+
+
     // ----------- CALCULATION FUNCTIONS ------------ //
 
     function rewardPerSecond(address a) public view returns (uint256) {
@@ -153,6 +163,9 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
                     getStakedAmount(user),
                     getRewards(user)
                 );
+
+                emit Transaction('deposit', user, eth, reward, block.timestamp);
+
             } else {
                 stakers[user].totalStaked += eth;
                 poolBalance += eth;
@@ -162,6 +175,8 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
                     getStakedAmount(user),
                     getRewards(user)
                 );
+
+                emit Transaction('deposit', user, eth, 0, block.timestamp);
             }
         } else {
             // Create new user
@@ -176,6 +191,8 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
             stakerList.push(user);
 
             emit StakerAdded(user, eth);
+
+            emit Transaction('deposit', user, eth, 0, block.timestamp);
         }
     }
 
@@ -229,6 +246,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         require(res2, "Failed to send tokens");
 
         emit UnstakeCompleted(user, harvest, withdrawal);
+        emit Transaction('unstake', user, withdrawal, harvest, block.timestamp);
     }
 
     // --------------- HARVEST FUNCTION -------------------//
@@ -258,6 +276,8 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         require(res2, "Failed to send tokens");
 
         emit RewardsHarvested(user, harvest);
+
+        emit Transaction('harvest', user, 0, harvest, block.timestamp);
     }
 
     // ----------------- OWNER FUNCTION ------------------- //
