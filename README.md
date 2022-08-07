@@ -1,40 +1,39 @@
-# React Truffle Box
+# Dapp Staking
 
-This box comes with everything you need to start using Truffle to write, compile, test, and deploy smart contracts, and interact with them from a React app.
+Cette Dapp permet de faire du staking d'Eth et de récupérer des tokens Dev en retour.
 
-## Installation
+# Video de présentation
 
-First ensure you are in an empty directory.
+Une vidéo de présentation du fonctionnement de la Dapp se trouve à cette adresse : 
+[Vidéo Loom](https://www.loom.com/share/43cb5924a5724d3b9665d991a141b55a)
 
-Run the `unbox` command using 1 of 2 ways.
+# Dapp sur GitHub pages
+
+La Dapp se trouve aussi en ligne sur GitHub Pages à l'url : https://nitrobear.github.io/Dapp-Voting/
+
+# Structure de l'application
+
+La Dapp est découpée en plusieurs composants, répartis dans les dossiers : 
+
 
 ```sh
-# Install Truffle globally and run `truffle unbox`
-$ npm install -g truffle
-$ truffle unbox react
+# Address
+Address.jsx : 'Pour l''affichage de la zone adresse de la personne connectée'
 ```
 
 ```sh
-# Alternatively, run `truffle unbox` via npx
-$ npx truffle unbox react
+# Footer
+Footer.jsx : 'Zone pour l''affichage des adresses pour le contrat et le token, ainsi que le bouton pour administrer les chamgements de status'
 ```
-
-Start the react dev server.
 
 ```sh
-$ cd client
-$ npm start
-  Starting the development server...
+# Pool
+PoolInformations.jsx : 'Zone pour l''affichage des informations sur la Pool.'
 ```
 
-From there, follow the instructions on the hosted React app. It will walk you through using Truffle and Ganache to deploy the `SimpleStorage` contract, making calls to it, and sending transactions to change the contract's state.
+```sh
+# Transactions
+Transactions.jsx : 'Affichage de la liste des transactions effectuées.'
+```
 
-## FAQ
-
-- __How do I use this with Ganache (or any other network)?__
-
-  The Truffle project is set to deploy to Ganache by default. If you'd like to change this, it's as easy as modifying the Truffle config file! Check out [our documentation on adding network configurations](https://trufflesuite.com/docs/truffle/reference/configuration/#networks). From there, you can run `truffle migrate` pointed to another network, restart the React dev server, and see the change take place.
-
-- __Where can I find more resources?__
-
-  This Box is a sweet combo of [Truffle](https://trufflesuite.com) and [Create React App](https://create-react-app.dev). Either one would be a great place to start!
+Le layout est basé sur Bootstrap.

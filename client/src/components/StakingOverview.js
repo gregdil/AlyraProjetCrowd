@@ -60,6 +60,9 @@ class StakingOverview extends Component{
         state.contract = contract;
         state.latestPrice = latestPrice;
         state.connectedWallet = accounts[0];
+
+        state.connectedWalletDisplay = state.connectedWallet.substring(1,12) + "..." + state.connectedWallet.substring(32);
+
         state = await connectWallet(state);
         state = await getContractProperties(state);
         state = await getUserTransactions(state);
@@ -133,7 +136,7 @@ class StakingOverview extends Component{
         let state = this.state
         return (
             <div>
-                <Address addrr={state.connectedWallet} /> 
+                <Address addrr={state.connectedWalletDisplay} /> 
                 <div className='container'>
 
                     <div className='row'>
