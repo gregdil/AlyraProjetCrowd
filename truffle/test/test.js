@@ -22,8 +22,13 @@ contract("Staking", (accounts) => {
 
   // ----------- ACTIVE POOL --------------//
 
-  describe("Registering new staker", () => {
-    let dateOfFirstStack;
+  describe("Active Pool", () => {
+    let dateOfFirstStackForNewStaker;
+    let dateOfFirstStackForStaker;
+    let dateOfFirstStackForOldStaker;
+    let dateOfLastStackForNewStaker;
+    let dateOfLastStackForStaker;
+    let dateOfLastStackForOldStaker;
     before(async () => {
       let tokenContract = await DevToken.deployed();
       let tokenAddress = tokenContract.address;
@@ -37,13 +42,80 @@ contract("Staking", (accounts) => {
       await StakingInstance.stake({
         from: newStaker,
         value: web3.utils.toWei("5", "ether"),
+        gas: 1000000,
       });
-      dateOfFirstStack = Date.now() / 1000;
+
+      dateOfFirstStackForNewStaker = Date.now() / 1000;
+      dateOfLastStackForNewStaker = Date.now() / 1000;
+
+      await StakingInstance.stake({
+        from: staker,
+        value: web3.utils.toWei("10", "ether"),
+        gas: 1000000,
+      });
+
+      dateOfFirstStackForStaker = Date.now() / 1000;
+
+      await StakingInstance.stake({
+        from: staker,
+        value: web3.utils.toWei("10", "ether"),
+        gas: 1000000,
+      });
+
+      dateOfLastStackForStaker = Date.now() / 1000;
+
+      await StakingInstance.stake({
+        from: oldStaker,
+        value: web3.utils.toWei("10", "ether"),
+        gas: 1000000,
+      });
+
+      dateOfFirstStackForOldStaker = Date.now() / 1000;
+
+      await StakingInstance.unstake({ from: oldStaker });
+
+      await StakingInstance.stake({
+        from: owner,
+        value: web3.utils.toWei("10", "wei"),
+        gas: 1000000,
+      });
     });
+
+    // -------------- GETTER --------------- //
+
+    it("should show staker", async () => {
+      const storedData = await StakingInstance.getStaker(newStaker, {
+        from: newStaker,
+      });
+      expect(storedData).to.be.true;
+    });
+
+    it("should show staker balance", async () => {
+      const storedData = await StakingInstance.getStakedAmount(nonStaker, {
+        from: newStaker,
+      });
+      expect(new BN(storedData.totalStaked)).to.be.bignumber.equal(new BN(0));
+    });
+
+    it("should show cooldown", async () => {
+      const storedData = await StakingInstance.getRemainingCooldown(newStaker, {
+        from: newStaker,
+      });
+      expect(new BN(storedData)).to.be.bignumber.equal(new BN(10));
+    });
+
+    it("should show number of stakers in the pool", async () => {
+      const storedData = await StakingInstance.getStakersInPool({
+        from: newStaker,
+      });
+      expect(new BN(storedData)).to.be.bignumber.equal(new BN(3));
+    });
+
+    // --------------- NEW STAKER --------------- //
 
     //Expect
 
-    it("should store total staked", async () => {
+    it("should store total staked for newStaker", async () => {
       const storedData = await StakingInstance.stakers(newStaker, {
         from: newStaker,
       });
@@ -56,24 +128,24 @@ contract("Staking", (accounts) => {
       const storedData = await StakingInstance.poolBalance({
         from: newStaker,
       });
-      expect(new BN(storedData / 1e18)).to.be.bignumber.equal(new BN(5));
+      expect(new BN(storedData / 1e18)).to.be.bignumber.equal(new BN(25));
     });
 
-    it("should store last deposit or claim date", async () => {
+    it("should store last deposit or claim date for newStaker", async () => {
       const storedData = await StakingInstance.stakers(newStaker);
       expect(new BN(storedData.lastDepositOrClaim)).to.be.bignumber.equal(
-        new BN(Date.now() / 1000)
+        new BN(dateOfLastStackForNewStaker)
       );
     });
 
-    it("should store first time deposit", async () => {
+    it("should store first time deposit for newStaker", async () => {
       const storedData = await StakingInstance.stakers(newStaker);
       expect(new BN(storedData.firstTimeDeposit)).to.be.bignumber.equal(
-        new BN(dateOfFirstStack)
+        new BN(dateOfFirstStackForNewStaker)
       );
     });
 
-    it("should new staker stored exist", async () => {
+    it("should newStaker stored exist", async () => {
       const storedData = await StakingInstance.stakers(newStaker);
       expect(storedData.exists).to.be.true;
     });
@@ -83,54 +155,10 @@ contract("Staking", (accounts) => {
       expect(storedData).to.be.equal(newStaker);
     });
 
-    //Revert
-
-    it("should revert when transfering without msg.value", async () => {
-      await expectRevert(
-        StakingInstance.stake({
-          from: newStaker,
-          value: web3.utils.toWei("0", "ether"),
-        }),
-        "You have not sent any ETH"
-      );
-    });
-
-    it("should revert when transfering without msg.value", async () => {
-      await expectRevert(
-        StakingInstance.stake({
-          from: newStaker,
-          value: web3.utils.toWei("0", "ether"),
-        }),
-        "You have not sent any ETH"
-      );
-    });
-  });
-
-  describe("Second stake for a staker", () => {
-    before(async () => {
-      let tokenContract = await DevToken.deployed();
-      let tokenAddress = tokenContract.address;
-      StakingInstance = await Staking.new(
-        annualRewardRate,
-        cooldown,
-        minimumReward,
-        tokenAddress,
-        { from: owner }
-      );
-
-      await StakingInstance.stake({
-        from: staker,
-        value: web3.utils.toWei("10", "ether"),
-      });
-      await StakingInstance.stake({
-        from: staker,
-        value: web3.utils.toWei("10", "ether"),
-      });
-    });
-
+    // -------------- STAKER -------------- //
     // Expect
 
-    it("should store new balanc for totalStaked after second stake", async () => {
+    it("should store new balance for totalStaked after second stake", async () => {
       const storedData = await StakingInstance.stakers(staker, {
         from: staker,
       });
@@ -140,18 +168,17 @@ contract("Staking", (accounts) => {
       );
     });
 
-    it("should stored in pool balance", async () => {
-      const storedData = await StakingInstance.poolBalance({
-        from: staker,
-      });
-
-      expect(new BN(storedData / 1e18)).to.be.bignumber.equal(new BN(20));
-    });
-
-    it("should store last deposit or claim date", async () => {
+    it("should store last deposit or claim date for Staker", async () => {
       const storedData = await StakingInstance.stakers(staker);
       expect(new BN(storedData.lastDepositOrClaim)).to.be.bignumber.equal(
-        new BN(Date.now() / 1000)
+        new BN(dateOfLastStackForStaker)
+      );
+    });
+
+    it("should store first time deposit for newStaker", async () => {
+      const storedData = await StakingInstance.stakers(staker);
+      expect(new BN(storedData.firstTimeDeposit)).to.be.bignumber.equal(
+        new BN(dateOfFirstStackForStaker)
       );
     });
 
@@ -161,47 +188,30 @@ contract("Staking", (accounts) => {
     });
 
     it("should newStaker is stocked in the array", async () => {
-      const storedData = await StakingInstance.stakerList(0);
+      const storedData = await StakingInstance.stakerList(1);
       expect(storedData).to.be.equal(staker);
     });
 
     it("should totalRewards staker are increase", async () => {
-      const storedData = await StakingInstance.stakers(staker);
-      setTimeout(() => {
-        expect(storedData).to.be.bignumber.equal(new BN(1659873707));
-      }, 5000);
-    });
-
-    // Revert
-
-    it("should revert when transfering without msg.value", async () => {
-      await expectRevert(
-        StakingInstance.stake({
-          from: staker,
-          value: web3.utils.toWei("0", "ether"),
-        }),
-        "You have not sent any ETH"
-      );
-    });
-  });
-
-  describe("what's left of an old staker", async () => {
-    before(async () => {
-      let tokenContract = await DevToken.deployed();
-      let tokenAddress = tokenContract.address;
-      StakingInstance = await Staking.new(
-        annualRewardRate,
-        cooldown,
-        minimumReward,
-        tokenAddress,
-        { from: owner }
-      );
       await StakingInstance.stake({
-        from: oldStaker,
+        from: staker,
         value: web3.utils.toWei("10", "ether"),
+        gas: 1000000,
       });
-      await StakingInstance.unstake({ from: oldStaker });
+      const storedData = await StakingInstance.stakers(staker);
+      expect(new BN(storedData.totalRewards)).to.be.bignumber.equal(
+        new BN(951293759512)
+      );
     });
+
+    it("should poolBalance has been modified after staking", async () => {
+      const storedData = await StakingInstance.poolBalance({
+        from: staker,
+      });
+      expect(new BN(storedData / 1e18)).to.be.bignumber.equal(new BN(35));
+    });
+
+    //  ------------ OLD STAKER --------------- //
 
     // Expect
 
@@ -213,18 +223,17 @@ contract("Staking", (accounts) => {
       expect(new BN(storedData.totalStaked)).to.be.bignumber.equal(new BN(0));
     });
 
-    it("should stored in pool balance", async () => {
-      const storedData = await StakingInstance.poolBalance({
-        from: staker,
-      });
-
-      expect(new BN(storedData)).to.be.bignumber.equal(new BN(0));
-    });
-
     it("should store last deposit or claim date", async () => {
       const storedData = await StakingInstance.stakers(oldStaker);
       expect(new BN(storedData.lastDepositOrClaim)).to.be.bignumber.equal(
         new BN(0)
+      );
+    });
+
+    it("should store first time deposit for oldStaker", async () => {
+      const storedData = await StakingInstance.stakers(newStaker);
+      expect(new BN(storedData.firstTimeDeposit)).to.be.bignumber.equal(
+        new BN(dateOfFirstStackForOldStaker)
       );
     });
 
@@ -233,16 +242,93 @@ contract("Staking", (accounts) => {
       expect(storedData.exists).to.be.true;
     });
 
-    it("should old staker all timme harvest is always ther", async () => {
-      const storedData = await StakingInstance.stakers(oldStaker);
-      expect(new BN(storedData.allTimeHarvested / 1e18)).to.be.bignumber.equal(
-        new BN(10)
+    // ------------ Revert ---------- //
+
+    it("should revert when transfering without msg.value", async () => {
+      await expectRevert(
+        StakingInstance.stake({
+          from: newStaker,
+          value: web3.utils.toWei("0", "ether"),
+          gas: 1000000,
+        }),
+        "You have not sent any ETH"
       );
     });
 
-    // Revert
+    it("should revert when partialUnstake without msg.value", async () => {
+      await expectRevert(
+        StakingInstance.partialUnstake(new BN(0), {
+          from: newStaker,
+        }),
+        "No amount entered"
+      );
+    });
 
-    //   it("should old staker can't unstake again");
+    it("should staker can't unstake more than totalStaked", async () => {
+      expectRevert(
+        StakingInstance.partialUnstake(new BN(10000000), {
+          from: owner,
+        }),
+        "You don't have enough funds"
+      );
+    });
+
+    it("should nonStaker can't unstake partialy", async () => {
+      expectRevert(
+        StakingInstance.partialUnstake(new BN(10000000), {
+          from: nonStaker,
+        }),
+        "You didn't participate in staking"
+      );
+    });
+
+    it("should old staker can't partial unstake again", async () => {
+      expectRevert(
+        StakingInstance.partialUnstake(new BN(10000000), {
+          from: oldStaker,
+        }),
+        "You have nothing to unstake"
+      );
+    });
+
+    it("should nonStaker can't unstake", async () => {
+      expectRevert(
+        StakingInstance.unstake({
+          from: nonStaker,
+        }),
+        "You didn't participate in staking"
+      );
+    });
+
+    // it("should old staker can't unstake again", async () => {
+    //   expectRevert(
+    //     StakingInstance.unstake({
+    //       from: oldStaker,
+    //       gas: 1000000,
+    //     }),
+    //     "You don't have enough funds"
+    //   );
+    // });
+
+    // ------------- EVENT --------- //
+
+    // it("should emit event on staking", async () => {
+    //   expectEvent(
+    //     await StakingInstance.stake({
+    //       from: newStaker,
+    //       value: web3.utils.toWei("10", "ether"),
+    //       gas: 1000000,
+    //     }),
+    //     "Transaction",
+    //     {
+    //       action: "deposit",
+    //       stakerAddress: newStaker,
+    //       amountStacked: web3.utils.fromWei("10", "ether"),
+    //       rewards: new BN(0),
+    //       timastamp: Date.now(),
+    //     }
+    //   );
+    // });
   });
 });
 
@@ -253,31 +339,3 @@ contract("Staking", (accounts) => {
 
 // stats infos
 // everybody can consult informations
-
-// All event
-
-// it("should emit event on staker restaking", async () => {
-//   expectEvent(
-//     await StakingInstance.stake({
-//       from: staker,
-//       value: web3.utils.toWei("5", "ether"),
-//     }),
-//     "StakingUpdate",
-//     {
-//       stakerAddress: staker,
-//       totalStaked: web3.utils.fromWei("25", "ether"),
-//       totalRewards: new BN(1659873707),
-//     }
-//   );
-// });
-
-// it("should emit event on staker added", async () => {
-//   expectEvent(
-//     await StakingInstance.stake({
-//       from: newStaker,
-//       value: web3.utils.toWei("5", "wei"),
-//     }),
-//     "StakerAdded",
-//     { stakerAddress: newStaker, totalStaked: new BN(5) }
-//   );
-// });

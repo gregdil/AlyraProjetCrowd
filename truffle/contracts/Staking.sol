@@ -47,18 +47,6 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
     }
 
     event PoolStatusChange(PoolInfo newStatus);
-    event StakerAdded(address stakerAddress, uint256 totalStaked);
-    event StakingUpdate(
-        address stakerAddress,
-        uint256 totalStaked,
-        uint256 totalRewards
-    );
-    event RewardsHarvested(address stakerAddress, uint256 rewardsHarvested);
-    event UnstakeCompleted(
-        address stakerAddress,
-        uint256 rewardsHarvested,
-        uint256 amountUnstaked
-    );
 
     event Transaction(
         string action,
@@ -140,7 +128,7 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
 
     // ----- STAKING / UNSTAKING FUNCTIONS  ---- //
 
-    function stake() external payable nonReentrant {
+    function stake() external payable {
         require(
             poolStatus == PoolInfo.ActivePool,
             "Pool isn't active, you can't do this now"
@@ -156,22 +144,12 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
                 stakers[user].totalStaked += eth;
                 poolBalance += eth;
                 stakers[user].lastDepositOrClaim = block.timestamp;
-                emit StakingUpdate(
-                    user,
-                    getStakedAmount(user),
-                    getRewards(user)
-                );
 
                 emit Transaction("deposit", user, eth, reward, block.timestamp);
             } else {
                 stakers[user].totalStaked += eth;
                 poolBalance += eth;
                 stakers[user].lastDepositOrClaim = block.timestamp;
-                emit StakingUpdate(
-                    user,
-                    getStakedAmount(user),
-                    getRewards(user)
-                );
 
                 emit Transaction("deposit", user, eth, 0, block.timestamp);
             }
@@ -187,25 +165,23 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
             stakers[user] = newUser;
             stakerList.push(user);
 
-            emit StakerAdded(user, eth);
-
             emit Transaction("deposit", user, eth, 0, block.timestamp);
         }
     }
 
-    function partialUnstake(uint256 amount) external nonReentrant {
+    function partialUnstake(uint256 amount) external {
+        address user = msg.sender;
+        uint256 eth = amount;
         require(
             poolStatus == PoolInfo.ActivePool,
             "Pool isn't active, you can't do this now"
         );
-        require(amount > 0, "No amount entered");
-        address user = msg.sender;
-        uint256 eth = amount;
+        require(eth > 0, "No amount entered");
         require(
             stakers[user].exists = true,
             "You didn't participate in staking"
         );
-
+        require(eth < stakers[user].totalStaked, "You don't have enough funds");
         require(stakers[user].totalStaked > 0, "You have nothing to unstake");
 
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
@@ -215,11 +191,9 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         stakers[user].lastDepositOrClaim = block.timestamp;
         (bool res, ) = user.call{value: amount}("");
         require(res, "Failed to send Ether");
-
-        emit StakingUpdate(user, getStakedAmount(user), getRewards(user));
     }
 
-    function unstake() external nonReentrant {
+    function unstake() external {
         require(
             poolStatus == PoolInfo.ActivePool,
             "Pool isn't active, you can't do this now"
@@ -244,28 +218,31 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
 
-        emit UnstakeCompleted(user, harvest, withdrawal);
         emit Transaction("unstake", user, withdrawal, harvest, block.timestamp);
     }
 
     // --------------- HARVEST FUNCTION -------------------//
 
-    function harvestReward() external nonReentrant {
+    function harvestReward() external {
+        address user = msg.sender;
+        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         require(
             poolStatus == PoolInfo.ActivePool ||
                 poolStatus == PoolInfo.PausedPool,
             "Pool is closed, you can't do this now"
         );
-        address user = msg.sender;
         require(
             stakers[user].exists = true,
             "You didn't participate in staking"
         );
         require(
+            stakers[user].totalRewards > minimumReward,
+            "You haven't reached the minimum reward"
+        );
+        require(
             (stakers[user].lastDepositOrClaim + cooldown < block.timestamp),
             "You haven't reached the minimum time between two harvests"
         );
-        uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
         stakers[user].totalRewards += reward;
         uint256 harvest = stakers[user].totalRewards;
         stakers[user].allTimeHarvested += harvest;
@@ -273,8 +250,6 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         stakers[user].totalRewards = 0;
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
-
-        emit RewardsHarvested(user, harvest);
 
         emit Transaction("harvest", user, 0, harvest, block.timestamp);
     }
@@ -325,7 +300,5 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
         require(res, "Failed to send Ether");
         bool res2 = ERC20(stakingToken).transfer(user, harvest);
         require(res2, "Failed to send tokens");
-
-        emit UnstakeCompleted(user, harvest, withdrawal);
     }
 }
