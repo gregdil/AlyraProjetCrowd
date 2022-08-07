@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/AlyraProjetCrowd/static/css/main.dc1fb064.chunk.css",
-    "main.js": "/AlyraProjetCrowd/static/js/main.67b693de.chunk.js",
-    "main.js.map": "/AlyraProjetCrowd/static/js/main.67b693de.chunk.js.map",
+    "main.js": "/AlyraProjetCrowd/static/js/main.01c98488.chunk.js",
+    "main.js.map": "/AlyraProjetCrowd/static/js/main.01c98488.chunk.js.map",
     "runtime-main.js": "/AlyraProjetCrowd/static/js/runtime-main.2d60fbb2.js",
     "runtime-main.js.map": "/AlyraProjetCrowd/static/js/runtime-main.2d60fbb2.js.map",
-    "static/js/2.0c3b8829.chunk.js": "/AlyraProjetCrowd/static/js/2.0c3b8829.chunk.js",
-    "static/js/2.0c3b8829.chunk.js.map": "/AlyraProjetCrowd/static/js/2.0c3b8829.chunk.js.map",
+    "static/js/2.f37557ca.chunk.js": "/AlyraProjetCrowd/static/js/2.f37557ca.chunk.js",
+    "static/js/2.f37557ca.chunk.js.map": "/AlyraProjetCrowd/static/js/2.f37557ca.chunk.js.map",
     "index.html": "/AlyraProjetCrowd/index.html",
     "static/css/main.dc1fb064.chunk.css.map": "/AlyraProjetCrowd/static/css/main.dc1fb064.chunk.css.map",
-    "static/js/2.0c3b8829.chunk.js.LICENSE.txt": "/AlyraProjetCrowd/static/js/2.0c3b8829.chunk.js.LICENSE.txt"
+    "static/js/2.f37557ca.chunk.js.LICENSE.txt": "/AlyraProjetCrowd/static/js/2.f37557ca.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.2d60fbb2.js",
-    "static/js/2.0c3b8829.chunk.js",
+    "static/js/2.f37557ca.chunk.js",
     "static/css/main.dc1fb064.chunk.css",
-    "static/js/main.67b693de.chunk.js"
+    "static/js/main.01c98488.chunk.js"
   ]
 }
