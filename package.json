@@ -4,6 +4,14 @@
     "@openzeppelin/contracts": "^4.7.2",
     "@truffle/hdwallet-provider": "^2.0.13",
     "dotenv": "^16.0.1",
-    "truffle-hdwallet-provider": "^1.0.17"
+    "mocha": "^10.0.0",
+    "truffle-hdwallet-provider": "^1.0.17",
+    "web3": "^1.7.5"
+  },
+  "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.15",
+    "chai": "^4.3.6",
+    "chai-bignumber": "^3.0.0",
+    "chai-bn": "^0.3.1"
   }
 }

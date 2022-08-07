@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity >=0.8.14;
-import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "../../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../../node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "../../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./Chainlink.sol";
 
 contract Staking is Ownable, ReentrancyGuard, Chainlink {
@@ -184,12 +184,14 @@ contract Staking is Ownable, ReentrancyGuard, Chainlink {
             poolStatus == PoolInfo.ActivePool,
             "Pool isn't active, you can't do this now"
         );
+        require(amount > 0, "No amount entered");
         address user = msg.sender;
         uint256 eth = amount;
         require(
             stakers[user].exists = true,
             "You didn't participate in staking"
         );
+
         require(stakers[user].totalStaked > 0, "You have nothing to unstake");
 
         uint256 reward = (rewardPerSecond(user) * rewardDuration(user));
