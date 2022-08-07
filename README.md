@@ -5,7 +5,7 @@ Cette Dapp permet de faire du staking d'Eth et de récupérer des tokens Dev en 
 # Video de présentation
 
 Une vidéo de présentation du fonctionnement de la Dapp se trouve à cette adresse : 
-[Vidéo Loom](https://www.loom.com/share/43cb5924a5724d3b9665d991a141b55a)
+[Vidéo Loom](https://www.loom.com/share/a1f46a44ce2241cc983f471c50cdb192)
 
 # Dapp sur GitHub pages
 

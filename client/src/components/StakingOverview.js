@@ -175,7 +175,6 @@ class StakingOverview extends Component{
                                             <p>Date of first deposit: {state.userProperties.firstTimeDeposit } </p>
                                         </div>
                                         <div className='col-6 text-end'>
-                                            {state.contractProperties.minimumReward}
                                             <button id="harvestRewardButton" className='btn btn-secondary btn-action m-2' onClick={this.harvestReward}>harvest Reward</button>
                                             <button id="unstakeButton" className='btn btn-secondary btn-action m-2' onClick={this.unstake}>Unstake</button>
                                         </div>
