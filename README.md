@@ -9,7 +9,7 @@ Une vidéo de présentation du fonctionnement de la Dapp se trouve à cette adre
 
 # Dapp sur GitHub pages
 
-La Dapp se trouve aussi en ligne sur GitHub Pages à l'url : https://nitrobear.github.io/Dapp-Voting/
+La Dapp se trouve aussi en ligne sur GitHub Pages à l'url : https://gregdil.github.io/AlyraProjetCrowd/
 
 # Structure de l'application
 
