@@ -111,6 +111,34 @@ contract("Staking", (accounts) => {
       expect(new BN(storedData)).to.be.bignumber.equal(new BN(3));
     });
 
+    it("should show last deposit or claim", async () => {
+      const storedData = await StakingInstance.getlastDepositOrClaim(
+        newStaker,
+        {
+          from: newStaker,
+        }
+      );
+      expect(new BN(storedData)).to.be.bignumber.equal(
+        new BN(dateOfLastStackForNewStaker)
+      );
+    });
+
+    it("should show all time harvest", async () => {
+      const storedData = await StakingInstance.getAllTimeHarvest(newStaker, {
+        from: newStaker,
+      });
+      expect(new BN(storedData)).to.be.bignumber.equal(new BN(0));
+    });
+
+    it("should show first time deposit", async () => {
+      const storedData = await StakingInstance.getFirstTimeDeposit(newStaker, {
+        from: newStaker,
+      });
+      expect(new BN(storedData)).to.be.bignumber.equal(
+        new BN(dateOfFirstStackForNewStaker)
+      );
+    });
+
     // --------------- NEW STAKER --------------- //
 
     //Expect
@@ -300,42 +328,14 @@ contract("Staking", (accounts) => {
       );
     });
 
-    // it("should old staker can't unstake again", async () => {
-    //   expectRevert(
-    //     StakingInstance.unstake({
-    //       from: oldStaker,
-    //       gas: 1000000,
-    //     }),
-    //     "You don't have enough funds"
-    //   );
-    // });
-
-    // ------------- EVENT --------- //
-
-    // it("should emit event on staking", async () => {
-    //   expectEvent(
-    //     await StakingInstance.stake({
-    //       from: newStaker,
-    //       value: web3.utils.toWei("10", "ether"),
-    //       gas: 1000000,
-    //     }),
-    //     "Transaction",
-    //     {
-    //       action: "deposit",
-    //       stakerAddress: newStaker,
-    //       amountStacked: web3.utils.fromWei("10", "ether"),
-    //       rewards: new BN(0),
-    //       timastamp: Date.now(),
-    //     }
-    //   );
-    // });
+    it("should old staker can't unstake again", async () => {
+      expectRevert(
+        StakingInstance.unstake({
+          from: oldStaker,
+          gas: 1000000,
+        }),
+        "You don't have enough funds"
+      );
+    });
   });
 });
-
-// web3.utils.fromWei('1', 'ether');
-// Staker describe
-
-//
-
-// stats infos
-// everybody can consult informations
