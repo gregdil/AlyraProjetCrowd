@@ -1,6 +1,7 @@
 const Staking = artifacts.require("Staking");
 const DevToken = artifacts.require("DevToken");
 const { BN, expectRevert, expectEvent } = require("@openzeppelin/test-helpers");
+const { web3 } = require("@openzeppelin/test-helpers/src/setup");
 const { expect } = require("chai");
 
 contract("Staking", (accounts) => {
@@ -12,6 +13,10 @@ contract("Staking", (accounts) => {
   const annualRewardRate = new BN(150);
   const cooldown = new BN(10);
   const minimumReward = new BN(0);
+
+  function timeout(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   let StakingInstance;
 
@@ -79,6 +84,16 @@ contract("Staking", (accounts) => {
     });
 
     //Revert
+
+    it("should revert when transfering without msg.value", async () => {
+      await expectRevert(
+        StakingInstance.stake({
+          from: newStaker,
+          value: web3.utils.toWei("0", "ether"),
+        }),
+        "You have not sent any ETH"
+      );
+    });
 
     it("should revert when transfering without msg.value", async () => {
       await expectRevert(
@@ -181,7 +196,14 @@ contract("Staking", (accounts) => {
         tokenAddress,
         { from: owner }
       );
+      await StakingInstance.stake({
+        from: oldStaker,
+        value: web3.utils.toWei("10", "ether"),
+      });
+      await StakingInstance.unstake({ from: oldStaker });
     });
+
+    // Expect
 
     it("should store new balance for totalStaked after unstake", async () => {
       const storedData = await StakingInstance.stakers(oldStaker, {
@@ -200,9 +222,9 @@ contract("Staking", (accounts) => {
     });
 
     it("should store last deposit or claim date", async () => {
-      const storedData = await StakingInstance.stakers(staker);
+      const storedData = await StakingInstance.stakers(oldStaker);
       expect(new BN(storedData.lastDepositOrClaim)).to.be.bignumber.equal(
-        new BN(Date.now() / 1000)
+        new BN(0)
       );
     });
 
@@ -210,6 +232,17 @@ contract("Staking", (accounts) => {
       const storedData = await StakingInstance.stakers(oldStaker);
       expect(storedData.exists).to.be.true;
     });
+
+    it("should old staker all timme harvest is always ther", async () => {
+      const storedData = await StakingInstance.stakers(oldStaker);
+      expect(new BN(storedData.allTimeHarvested / 1e18)).to.be.bignumber.equal(
+        new BN(10)
+      );
+    });
+
+    // Revert
+
+    //   it("should old staker can't unstake again");
   });
 });
 
