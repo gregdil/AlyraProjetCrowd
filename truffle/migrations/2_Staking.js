@@ -13,12 +13,8 @@ module.exports = async function (deployer) {
   await deployer.deploy(Staking, annualRewardRate, cooldown, minimumReward, tokenAddress);
 
   const stakingContract = await Staking.deployed()
-
-  console.log('Token address           : ' + tokenAddress);
-  console.log('stakingContract address : ' + stakingContract.address);
   
   // Ajout des token au smartContract
   var token = await DevToken.at(tokenAddress)
   await token.claim(stakingContract.address, '1000000000000000000000000000')
-
 };

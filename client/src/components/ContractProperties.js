@@ -123,7 +123,7 @@ class ContractProperties extends Component{
                 <div className='row'>
                     <div className='col'>
                         <Address addrr={state.accounts} />
-                        <button onClick={() => this.props.navigate('/main')}>Back to overview</button>
+                        <button onClick={() => this.props.navigate('/')}>Back to overview</button>
                         <div className='Title'>
                             Update global parameters
                         </div>

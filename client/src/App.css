@@ -14,90 +14,27 @@
 }
 
 body {
-
-  background-color: #F0F3F5;
+font-size: 1.4rem;
+  background-color: #f1f1f1;
 }
+
+p {
+  margin-top: 1rem;
+  margin-bottom: 0.2rem;
+  padding: 0;
+  line-height: 1.8rem;
+}
+
 #logo {
   margin: 10px;
 }
-span.amount {
-  margin-top:1rem;
-  padding-top: 1rem;
-  font-size: 4rem;
-  font-weight: normal;
-  color: #31135C;
-}
 
-span.currency {
-
-  margin-top:1rem;
-  padding-top: 1rem;
-  font-size: 2rem;
-  font-weight: bold;
-  color: #31135C;
-}
 
 #App .container {
   width: 40%;
   min-width: 60rem;
   max-width: 75rem;
   height: 100%;
-}
-
-code {
-  display: block;
-  white-space: pre-wrap;
-  padding: 1.2rem 2rem;
-  border-radius: 1rem;
-  background-color: var(--light-gray);
-  font-size: 1.4rem;
-}
-
-code span {
-  transition: all 0.3s;
-}
-
-code span.primary-color {
-  color: var(--primary-color);
-}
-
-code span.secondary-color {
-  color: var(--secondary-color);
-}
-
-code span.dim-color {
-  color: var(--gray);
-}
-
-code span.flash {
-  background-color: var(--flash-color);
-}
-
-details {
-  margin: 1.6rem 0;
-  padding: 0.5rem 2rem 0.5rem 0;
-  border: 1px solid var(--light-gray);
-  border-radius: 1rem;
-}
-
-details :not(summary, span) {
-  margin-left: 2.55rem;
-}
-
-details summary {
-  padding: 1.2rem;
-  cursor: pointer;
-}
-
-p,
-details code {
-  margin-top: 1rem;
-  margin-bottom: 1.4rem;
-}
-
-p span.code {
-  font-family: monospace;
-  color: var(--gray);
 }
 
 hr {
@@ -160,4 +97,51 @@ hr {
 #App .container footer a {
   display: inline-block;
   margin: 2rem 1rem 0 0;
+}
+
+#newStake {
+  font-size: 2rem;
+  padding: 1rem;
+  text-align: right;
+
+  border: 1px solid #31135C;
+  border-right: 0px solid transparent;
+  height: 55px;
+}
+#stakeButton {
+  font-size: 2rem;
+  padding: 10px 2rem;
+  margin: 0;
+  background-color: #31135C;
+  margin-top: -8px;
+  border: 1px solid #31135C;
+  border-bottom: 1px solid #31135C;
+  border-radius: 0;
+  height: 55px;
+}
+.btn-action {
+  background-color: #31135C;
+  font-size: 1.42rem;
+}
+p.amount {
+  padding-top: 1rem;
+  
+}
+span.amount {
+  padding-top: 4rem;
+  line-height: 5rem;
+  font-size: 4rem;
+  font-weight: normal;
+  color: #31135C;
+}
+
+span.currency {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #31135C;
+}
+
+h2.top-card-title {
+  margin-top:3rem;
+  margin-bottom: 0.5rem;
 }
