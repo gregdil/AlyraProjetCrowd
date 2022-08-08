@@ -11,7 +11,7 @@ export default class Address extends React.Component {
             <div className='container'>
                 <div className='row'>
                     <div className='col-6'>
-                        <img src="/logo_staking.png" width="50" id="logo" alt="Stakink system logo" />
+                        <img src="/AlyraProjetCrowd/logo_staking.png" width="50" id="logo" alt="Stakink system logo" />
                     </div>
                     <div className='col-6 px-2 text-right'>
                         <p className='px-3 pt-3'>Your wallet adresss:<br></br><b>{this.props.addrr}</b></p>

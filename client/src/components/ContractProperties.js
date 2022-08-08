@@ -68,7 +68,7 @@ class ContractProperties extends Component{
                         <div className='row'>
                             <div className='col'>
                                 <Address addrr={state.accounts} />
-                                <button className='btn btn-secondary btn-action m-2' onClick={() => this.props.navigate('/')}>Back to overview</button>
+                                <button className='btn btn-secondary btn-action m-2' onClick={() => this.props.navigate('/AlyraProjetCrowd/')}>Back to overview</button>
                                 <h1>Pool is Active</h1>
                             </div>
                         </div>
@@ -90,7 +90,7 @@ class ContractProperties extends Component{
                         <div className='row'>
                             <div className='col'>
                                 <Address addrr={state.accounts} />
-                                <button className='btn btn-secondary btn-action m-2' onClick={() => this.props.navigate('/')}>Back to overview</button>
+                                <button className='btn btn-secondary btn-action m-2' onClick={() => this.props.navigate('/AlyraProjetCrowd/')}>Back to overview</button>
                                 <h1>
                                         Pool is Paused
                                         {state.currentStep}
@@ -125,7 +125,7 @@ class ContractProperties extends Component{
                         <div className='row'>
                             <div className='col-12'>
                                 <Address addrr={state.accounts} />
-                                <button  className='btn btn-secondary btn-action m-2' onClick={() => this.props.navigate('/')}>Back to overview</button>
+                                <button  className='btn btn-secondary btn-action m-2' onClick={() => this.props.navigate('/AlyraProjetCrowd/')}>Back to overview</button>
                                 <h1>Pool is Closed</h1>
                                 <div>
                                 Update the global parameters as contract owner. The address of the contract owner able to update the contract state is: '{state.contractOwnerAddresse}'.

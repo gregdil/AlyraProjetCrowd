@@ -93,7 +93,7 @@ class App extends Component {
     return (
       <Router>
         <Routes>
-          <Route path='/' element = { <StakingOverviewWithNavigate state={this.state} />}/>
+          <Route path='/AlyraProjetCrowd' element = { <StakingOverviewWithNavigate state={this.state} />}/>
           <Route path='/contract' element = { <ContractPropertiesWithNavigate state={this.state} />} />
         </Routes>
       </Router>
